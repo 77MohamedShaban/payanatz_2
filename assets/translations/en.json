@@ -24,7 +24,7 @@
   "yes": "Yes",
   "successful": "Successful",
   "create_success_message": "You Successfully Created New Department",
-  "no_departments_yet": "No Departments Yet",
+  "no_departments_yet": "No Departments Found",
   "no_departments_subtitle": "Try another name or create a new department",
   "invalid_email": "Please enter a valid email",
   "password_too_short": "Password must be at least 6 characters",

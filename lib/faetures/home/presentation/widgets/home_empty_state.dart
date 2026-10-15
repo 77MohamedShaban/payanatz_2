@@ -28,16 +28,16 @@ class HomeEmptyState extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: AppColors.fieldGrey,
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
                 ],
               ),
               child: Icon(
-                Icons.business_center_outlined,
+                Icons.square_rounded,
                 size: 80.sp,
-                color: AppColors.mainBlue.withOpacity(0.5),
+                color: AppColors.hintGrey,
               ),
             ),
             SizedBox(height: 32.h),
@@ -71,7 +71,7 @@ class HomeEmptyState extends StatelessWidget {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.mainBlue,
+                  backgroundColor: AppColors.hintGrey,
                   padding: REdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
@@ -80,10 +80,7 @@ class HomeEmptyState extends StatelessWidget {
                 ),
                 child: Text(
                   AppStrings.createDepartment,
-                  style: AppTextStyles.cairo14MediumBlack.copyWith(
-                    color: AppColors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.cairo14MediumBlack
                 ),
               ),
             ),
