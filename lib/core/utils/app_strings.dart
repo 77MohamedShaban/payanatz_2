@@ -29,4 +29,15 @@ abstract final class AppStrings {
   static String get createSuccessMessage => "create_success_message".tr();
   static String get noDepartmentsYet => "no_departments_yet".tr();
   static String get noDepartmentsSubtitle => "no_departments_subtitle".tr();
+  
+  // Validation Strings
+  static String get invalidEmail => "invalid_email".tr();
+  static String get passwordTooShort => "password_too_short".tr();
+  static String get invalidPhone => "invalid_phone".tr();
+  static String get passwordsDoNotMatch => "passwords_do_not_match".tr();
+  
+  // New Strings
+  static String get defaultManagerName => "moataz_hamed".tr();
+  static String get noMatchingDepartments => "no_matching_departments".tr();
+  static String get ok => "ok".tr();
 }

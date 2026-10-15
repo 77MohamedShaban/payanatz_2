@@ -30,7 +30,7 @@ class PayanatzApp extends StatelessWidget {
               locale: context.locale,
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
-              themeMode: ThemeMode.dark,
+              themeMode: state,
               initialRoute: RoutesName.home,
               onGenerateRoute: AppRoutes.getRoute,
             ),

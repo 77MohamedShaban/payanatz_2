@@ -1,16 +1,13 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../core/di/di.dart';
-import '../../../core/reusable_component/custom_text_form_field.dart';
-import '../../../core/routes_manager/routes_name.dart';
-import '../../../core/utils/app_strings.dart';
-import '../../../core/utils/theme/app_colors.dart';
-import '../../../core/utils/theme/app_text_styles.dart';
-import 'cubit/home_cubit.dart';
-import 'cubit/home_state.dart';
-import '../domain/entities/department.dart';
+import 'package:recap_project/core/di/di.dart';
+import 'package:recap_project/faetures/home/presentation/cubit/home_cubit.dart';
+import 'package:recap_project/faetures/home/presentation/cubit/home_state.dart';
+import 'package:recap_project/faetures/home/presentation/widgets/home_actions_row.dart';
+import 'package:recap_project/faetures/home/presentation/widgets/home_breadcrumb.dart';
+import 'package:recap_project/faetures/home/presentation/widgets/home_empty_state.dart';
+import 'package:recap_project/faetures/home/presentation/widgets/department_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -30,359 +27,57 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return BlocProvider(
       create: (context) => getIt<HomeCubit>()..getDepartments(),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            backgroundColor: AppColors.backgroundGrey,
-            body: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 36.h),
-                    _buildBreadcrumb(),
-                    SizedBox(height: 36.h),
-                    _buildActionsRow(context),
-                    SizedBox(height: 24.h),
-                    Expanded(
-                      child: BlocBuilder<HomeCubit, HomeState>(
-                        builder: (context, state) {
-                          if (state is HomeLoading) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (state is HomeSuccess) {
-                            if (state.departments.isEmpty && _searchController.text.isEmpty) {
-                              return _buildEmptyState(context);
-                            }
-                            if (state.departments.isEmpty && _searchController.text.isNotEmpty) {
-                              return Center(
-                                child: Text(
-                                  "No matching departments",
-                                  style: AppTextStyles.cairo14MediumBlack,
-                                ),
-                              );
-                            }
-                            return RefreshIndicator(
-                              onRefresh: () => context.read<HomeCubit>().getDepartments(),
-                              child: _buildDepartmentsList(state.departments),
-                            );
-                          } else if (state is HomeError) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(state.message),
-                                  ElevatedButton(
-                                    onPressed: () => context.read<HomeCubit>().getDepartments(),
-                                    child: const Text("Retry"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Container(
-        height: 500.h,
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 150.w,
-              height: 150.h,
-              decoration: BoxDecoration(
-                color: AppColors.fieldGrey,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.square_rounded,
-                size: 80.sp,
-                color: AppColors.hintGrey.withOpacity(0.5),
-              ),
-            ),
-            SizedBox(height: 32.h),
-            Text(
-              AppStrings.noDepartmentsYet,
-              style: AppTextStyles.cairo20MediumBlack,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 12.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.w),
-              child: Text(
-                AppStrings.noDepartmentsSubtitle,
-                style: AppTextStyles.cairo14MediumBlack.copyWith(
-                  color: AppColors.textGrey,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(height: 32.h),
-            SizedBox(
-              width: 200.w,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await Navigator.pushNamed(context, RoutesName.createDepartment);
-                  if (context.mounted) {
-                    context.read<HomeCubit>().getDepartments();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.hintGrey,
-                  padding: REdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  AppStrings.createDepartment,
-                  style: AppTextStyles.cairo14MediumBlack.copyWith(
-                    color: AppColors.blackBase,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBreadcrumb() {
-    return Row(
-      children: [
-        Text(
-          AppStrings.hr,
-          style: AppTextStyles.cairo24MediumGrey,
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
-          child: Icon(
-            Icons.arrow_forward_ios,
-            size: 16.sp,
-            color: AppColors.textGrey,
-          ),
-        ),
-        Text(
-          AppStrings.departments,
-          style: AppTextStyles.cairo24MediumBlack,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionsRow(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 48.h,
-                child: CustomTextFormField(
-                  controller: _searchController,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.search,
-                  hintText: AppStrings.searchHint,
-                  onChanged: (value) {
-                    context.read<HomeCubit>().searchDepartments(value);
-                  },
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: AppColors.hintGrey,
-                    size: 20.sp,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: [
-            Expanded(
-              child: _buildButton(
-                text: AppStrings.filter,
-                onPressed: () {},
-                backgroundColor: Colors.white,
-                borderColor: AppColors.borderGrey,
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: _buildButton(
-                text: AppStrings.createDepartment,
-                onPressed: () async {
-                  await Navigator.pushNamed(context, RoutesName.createDepartment);
-                  if (context.mounted) {
-                    context.read<HomeCubit>().getDepartments();
-                  }
-                },
-                backgroundColor: AppColors.hintGrey,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildButton({
-    required String text,
-    required VoidCallback onPressed,
-    required Color backgroundColor,
-    Color? borderColor,
-  }) {
-    return Container(
-      height: 48.h,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8.r),
-        border: borderColor != null ? Border.all(color: borderColor) : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(8.r),
-          child: Center(
-            child: Text(
-              text,
-              style: AppTextStyles.cairo14MediumBlack,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDepartmentsList(List<Department> departments) {
-    return ListView.separated(
-      padding: EdgeInsets.only(bottom: 20.h),
-      itemCount: departments.length,
-      separatorBuilder: (context, index) => SizedBox(height: 16.h),
-      itemBuilder: (context, index) => _DepartmentCard(dept: departments[index]),
-    );
-  }
-}
-
-class _DepartmentCard extends StatelessWidget {
-  final Department dept;
-
-  const _DepartmentCard({Key? key, required this.dept}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 120.h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 6.w,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(dept.colorHex),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8.r),
-                  bottomLeft: Radius.circular(8.r),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 12.h, 12.w, 12.h),
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      dept.name,
-                      style: AppTextStyles.cairo15MediumBlack,
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.tagBackground,
-                        borderRadius: BorderRadius.circular(11.r),
-                      ),
-                      child: Text(
-                        dept.code,
-                        style: AppTextStyles.cairo11MediumGrey,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 13.r,
-                      backgroundColor: AppColors.fieldGrey,
-                      child: Icon(Icons.person, size: 16.sp, color: AppColors.hintGrey),
-                    ),
-                    SizedBox(width: 8.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          dept.manager,
-                          style: AppTextStyles.cairo11RegularBlack,
-                        ),
-                        Text(
-                          AppStrings.manager,
-                          style: AppTextStyles.cairo10RegularGrey,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                const Divider(height: 1, color: AppColors.borderGrey),
-                SizedBox(height: 4.h),
-                Text(
-                  AppStrings.employeesCount.replaceFirst("{}", dept.employeesCount.toString()),
-                  style: AppTextStyles.cairo10RegularGrey,
+                SizedBox(height: 36.h),
+                const HomeBreadcrumb(),
+                SizedBox(height: 36.h),
+                HomeActionsRow(searchController: _searchController),
+                SizedBox(height: 24.h),
+                Expanded(
+                  child: BlocBuilder<HomeCubit, HomeState>(
+                    builder: (context, state) {
+                      if (state is HomeLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is HomeSuccess) {
+                        if (state.departments.isEmpty) {
+                          return _searchController.text.isEmpty
+                              ? const HomeEmptyState()
+                              : Center(
+                                  child: Text(
+                                    "No matching departments",
+                                    style: theme.textTheme.bodyLarge,
+                                  ),
+                                );
+                        }
+                        return RefreshIndicator(
+                          onRefresh: () => context.read<HomeCubit>().getDepartments(),
+                          child: ListView.separated(
+                            padding: EdgeInsets.only(bottom: 20.h),
+                            itemCount: state.departments.length,
+                            separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                            itemBuilder: (context, index) => DepartmentCard(dept: state.departments[index]),
+                          ),
+                        );
+                      } else if (state is HomeError) {
+                        return Center(child: Text(state.message));
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

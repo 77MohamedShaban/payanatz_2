@@ -81,7 +81,7 @@ class _CustomFieldState extends State<CustomTextFormField> {
             : widget.suffixIcon,
         suffixIconColor: theme.colorScheme.onPrimary,
         hintText: widget.hintText,
-        hintStyle: theme.textTheme.labelSmall,
+        hintStyle: theme.textTheme.bodySmall,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.r),
           borderSide: BorderSide(
