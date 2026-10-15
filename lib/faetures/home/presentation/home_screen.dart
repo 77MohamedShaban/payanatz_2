@@ -18,51 +18,58 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<HomeCubit>()..getDepartments(),
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundGrey,
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 36.h),
-                _buildBreadcrumb(),
-                SizedBox(height: 36.h),
-                _buildActionsRow(context),
-                SizedBox(height: 24.h),
-                Expanded(
-                  child: BlocBuilder<HomeCubit, HomeState>(
-                    builder: (context, state) {
-                      if (state is HomeLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state is HomeSuccess) {
-                        if (state.departments.isEmpty) {
-                          return const Center(child: Text("No Departments Found"));
-                        }
-                        return _buildDepartmentsList(state.departments);
-                      } else if (state is HomeError) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(state.message),
-                              ElevatedButton(
-                                onPressed: () => context.read<HomeCubit>().getDepartments(),
-                                child: const Text("Retry"),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: AppColors.backgroundGrey,
+            body: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 36.h),
+                    _buildBreadcrumb(),
+                    SizedBox(height: 36.h),
+                    _buildActionsRow(context),
+                    SizedBox(height: 24.h),
+                    Expanded(
+                      child: BlocBuilder<HomeCubit, HomeState>(
+                        builder: (context, state) {
+                          if (state is HomeLoading) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (state is HomeSuccess) {
+                            if (state.departments.isEmpty) {
+                              return const Center(child: Text("No Departments Found"));
+                            }
+                            return RefreshIndicator(
+                              onRefresh: () => context.read<HomeCubit>().getDepartments(),
+                              child: _buildDepartmentsList(state.departments),
+                            );
+                          } else if (state is HomeError) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(state.message),
+                                  ElevatedButton(
+                                    onPressed: () => context.read<HomeCubit>().getDepartments(),
+                                    child: const Text("Retry"),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        }
       ),
     );
   }
@@ -128,8 +135,11 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _buildButton(
                 text: 'create_department'.tr(),
-                onPressed: () {
-                  Navigator.pushNamed(context, RoutesName.createDepartment);
+                onPressed: () async {
+                  await Navigator.pushNamed(context, RoutesName.createDepartment);
+                  if (context.mounted) {
+                    context.read<HomeCubit>().getDepartments();
+                  }
                 },
                 backgroundColor: AppColors.hintGrey,
               ),
@@ -186,7 +196,6 @@ class _DepartmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
     return Container(
       height: 120.h,
       decoration: BoxDecoration(
