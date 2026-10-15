@@ -10,7 +10,7 @@ abstract class AppTheme {
     drawerTheme: const DrawerThemeData(backgroundColor: AppColors.white),
     dividerTheme: DividerThemeData(color: AppColors.strokeGrey, thickness: 1.h),
     colorScheme: ColorScheme.light(
-      primary: AppColors.mainBlue,
+      primary: AppColors.blackBase,
       onPrimary: AppColors.white,
       surface: AppColors.white,
     ),
@@ -26,7 +26,7 @@ abstract class AppTheme {
     drawerTheme: const DrawerThemeData(backgroundColor: AppColors.backgroundDark),
     dividerTheme: DividerThemeData(color: AppColors.secondaryGrey, thickness: 1.h),
     colorScheme: ColorScheme.dark(
-      primary: AppColors.mainBlueDark,
+      primary: AppColors.blackBase,
       onPrimary: AppColors.white,
       surface: AppColors.backgroundDark,
     ),

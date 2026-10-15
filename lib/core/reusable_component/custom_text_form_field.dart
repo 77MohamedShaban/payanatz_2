@@ -56,7 +56,7 @@ class _CustomFieldState extends State<CustomTextFormField> {
       textInputAction: widget.textInputAction,
       obscureText: isShowPassword,
       style: theme.textTheme.labelSmall?.copyWith(
-          fontSize: 18, fontWeight: .w500),
+          fontSize: 18, fontWeight: .w500 , color: theme.colorScheme.primary),
       decoration: InputDecoration(
         prefixIcon: Padding(
             padding:  REdgeInsetsDirectional.only(start: 16, end: 8),
@@ -80,6 +80,14 @@ class _CustomFieldState extends State<CustomTextFormField> {
         hintText: widget.hintText,
         hintStyle: theme.textTheme.labelSmall,
         enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15.r
+          ),
+          borderSide: BorderSide(
+            color: theme.colorScheme.onPrimary,
+            width: 1,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.r),
         ),
         focusedBorder: OutlineInputBorder(
@@ -100,7 +108,7 @@ class _CustomFieldState extends State<CustomTextFormField> {
           ),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.onPrimary,
       ),
       validator: widget.validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,

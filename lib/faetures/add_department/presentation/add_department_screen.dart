@@ -69,12 +69,12 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
             DialogUtils.showLoading(context: context, message: "");
           } else if (state is AddDepartmentSuccess) {
             DialogUtils.hideLoading(context);
-            DialogUtils.showMessage(
+            DialogUtils.showSuccessDialog(
               context: context,
               title: AppStrings.successful,
               message: AppStrings.createSuccessMessage,
-              posActionName: "Ok",
-              posAction: () {
+              buttonText: "Ok",
+              onConfirm: () {
                 Navigator.pop(context);
               },
             );
@@ -84,6 +84,7 @@ class _AddDepartmentScreenState extends State<AddDepartmentScreen> {
               context: context,
               message: state.message,
               posActionName: "Ok",
+              isError: true,
             );
           }
         },
