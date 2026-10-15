@@ -1,34 +1,75 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/di/di.dart';
 import '../../../core/reusable_component/custom_text_form_field.dart';
+import '../../../core/routes_manager/routes_name.dart';
 import '../../../core/utils/theme/app_colors.dart';
 import '../../../core/utils/theme/app_text_styles.dart';
+import 'cubit/home_cubit.dart';
+import 'cubit/home_state.dart';
+import '../domain/entities/department.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 36.h),
-              _buildBreadcrumb(),
-              SizedBox(height: 36.h),
-              _buildActionsRow(context),
-              SizedBox(height: 24.h),
-              Expanded(
-                child: _buildDepartmentsList(),
+    return BlocProvider(
+      create: (context) => getIt<HomeCubit>()..getDepartments(),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: AppColors.backgroundGrey,
+            body: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 36.h),
+                    _buildBreadcrumb(),
+                    SizedBox(height: 36.h),
+                    _buildActionsRow(context),
+                    SizedBox(height: 24.h),
+                    Expanded(
+                      child: BlocBuilder<HomeCubit, HomeState>(
+                        builder: (context, state) {
+                          if (state is HomeLoading) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (state is HomeSuccess) {
+                            if (state.departments.isEmpty) {
+                              return const Center(child: Text("No Departments Found"));
+                            }
+                            return RefreshIndicator(
+                              onRefresh: () => context.read<HomeCubit>().getDepartments(),
+                              child: _buildDepartmentsList(state.departments),
+                            );
+                          } else if (state is HomeError) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(state.message),
+                                  ElevatedButton(
+                                    onPressed: () => context.read<HomeCubit>().getDepartments(),
+                                    child: const Text("Retry"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }
       ),
     );
   }
@@ -94,7 +135,12 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _buildButton(
                 text: 'create_department'.tr(),
-                onPressed: () {},
+                onPressed: () async {
+                  await Navigator.pushNamed(context, RoutesName.createDepartment);
+                  if (context.mounted) {
+                    context.read<HomeCubit>().getDepartments();
+                  }
+                },
                 backgroundColor: AppColors.hintGrey,
               ),
             ),
@@ -133,16 +179,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDepartmentsList() {
-    final departments = [
-      _Dept(name: 'marketing'.tr(), code: 'MKT', manager: 'Amro Handousa', count: 12, color: AppColors.deptBlue),
-      _Dept(name: 'human_resources'.tr(), code: 'HR', manager: 'Sara Ali', count: 8, color: AppColors.deptGreen),
-      _Dept(name: 'finance'.tr(), code: 'FIN', manager: 'Omar Adel', count: 6, color: AppColors.deptYellow),
-      _Dept(name: 'sales'.tr(), code: 'SLS', manager: 'Mona Samir', count: 15, color: AppColors.deptRed),
-      _Dept(name: 'development'.tr(), code: 'DEV', manager: 'Moataz Hamed', count: 21, color: AppColors.deptPurple),
-      _Dept(name: 'design'.tr(), code: 'DSN', manager: 'Salma Ameer', count: 5, color: AppColors.deptOrange),
-    ];
-
+  Widget _buildDepartmentsList(List<Department> departments) {
     return ListView.separated(
       padding: EdgeInsets.only(bottom: 20.h),
       itemCount: departments.length,
@@ -152,24 +189,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _Dept {
-  final String name;
-  final String code;
-  final String manager;
-  final int count;
-  final Color color;
-
-  _Dept({
-    required this.name,
-    required this.code,
-    required this.manager,
-    required this.count,
-    required this.color,
-  });
-}
-
 class _DepartmentCard extends StatelessWidget {
-  final _Dept dept;
+  final Department dept;
 
   const _DepartmentCard({Key? key, required this.dept}) : super(key: key);
 
@@ -190,7 +211,7 @@ class _DepartmentCard extends StatelessWidget {
             width: 6.w,
             child: Container(
               decoration: BoxDecoration(
-                color: dept.color,
+                color: Color(dept.colorHex),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(8.r),
                   bottomLeft: Radius.circular(8.r),
@@ -251,7 +272,7 @@ class _DepartmentCard extends StatelessWidget {
                 const Divider(height: 1, color: AppColors.borderGrey),
                 SizedBox(height: 4.h),
                 Text(
-                  'employees_count'.tr(args: [dept.count.toString()]),
+                  'employees_count'.tr(args: [dept.employeesCount.toString()]),
                   style: AppTextStyles.cairo10RegularGrey,
                 ),
               ],
