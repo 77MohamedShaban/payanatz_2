@@ -5,14 +5,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/di/di.dart';
 import '../../../core/reusable_component/custom_text_form_field.dart';
 import '../../../core/routes_manager/routes_name.dart';
+import '../../../core/utils/app_strings.dart';
 import '../../../core/utils/theme/app_colors.dart';
 import '../../../core/utils/theme/app_text_styles.dart';
 import 'cubit/home_cubit.dart';
 import 'cubit/home_state.dart';
 import '../domain/entities/department.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +53,16 @@ class HomeScreen extends StatelessWidget {
                           if (state is HomeLoading) {
                             return const Center(child: CircularProgressIndicator());
                           } else if (state is HomeSuccess) {
-                            if (state.departments.isEmpty) {
-                              return const Center(child: Text("No Departments Found"));
+                            if (state.departments.isEmpty && _searchController.text.isEmpty) {
+                              return _buildEmptyState(context);
+                            }
+                            if (state.departments.isEmpty && _searchController.text.isNotEmpty) {
+                              return Center(
+                                child: Text(
+                                  "No matching departments",
+                                  style: AppTextStyles.cairo14MediumBlack,
+                                ),
+                              );
                             }
                             return RefreshIndicator(
                               onRefresh: () => context.read<HomeCubit>().getDepartments(),
@@ -74,11 +96,90 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildEmptyState(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Container(
+        height: 500.h,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 150.w,
+              height: 150.h,
+              decoration: BoxDecoration(
+                color: AppColors.fieldGrey,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.square_rounded,
+                size: 80.sp,
+                color: AppColors.hintGrey.withOpacity(0.5),
+              ),
+            ),
+            SizedBox(height: 32.h),
+            Text(
+              AppStrings.noDepartmentsYet,
+              style: AppTextStyles.cairo20MediumBlack,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 12.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.w),
+              child: Text(
+                AppStrings.noDepartmentsSubtitle,
+                style: AppTextStyles.cairo14MediumBlack.copyWith(
+                  color: AppColors.textGrey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 32.h),
+            SizedBox(
+              width: 200.w,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, RoutesName.createDepartment);
+                  if (context.mounted) {
+                    context.read<HomeCubit>().getDepartments();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.hintGrey,
+                  padding: REdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  AppStrings.createDepartment,
+                  style: AppTextStyles.cairo14MediumBlack.copyWith(
+                    color: AppColors.blackBase,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBreadcrumb() {
     return Row(
       children: [
         Text(
-          'hr'.tr(),
+          AppStrings.hr,
           style: AppTextStyles.cairo24MediumGrey,
         ),
         Padding(
@@ -90,7 +191,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         Text(
-          'departments'.tr(),
+          AppStrings.departments,
           style: AppTextStyles.cairo24MediumBlack,
         ),
       ],
@@ -106,10 +207,13 @@ class HomeScreen extends StatelessWidget {
               child: SizedBox(
                 height: 48.h,
                 child: CustomTextFormField(
-                  controller: TextEditingController(),
+                  controller: _searchController,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.search,
-                  hintText: 'search_hint'.tr(),
+                  hintText: AppStrings.searchHint,
+                  onChanged: (value) {
+                    context.read<HomeCubit>().searchDepartments(value);
+                  },
                   prefixIcon: Icon(
                     Icons.search,
                     color: AppColors.hintGrey,
@@ -125,7 +229,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             Expanded(
               child: _buildButton(
-                text: 'filter'.tr(),
+                text: AppStrings.filter,
                 onPressed: () {},
                 backgroundColor: Colors.white,
                 borderColor: AppColors.borderGrey,
@@ -134,7 +238,7 @@ class HomeScreen extends StatelessWidget {
             SizedBox(width: 12.w),
             Expanded(
               child: _buildButton(
-                text: 'create_department'.tr(),
+                text: AppStrings.createDepartment,
                 onPressed: () async {
                   await Navigator.pushNamed(context, RoutesName.createDepartment);
                   if (context.mounted) {
@@ -261,7 +365,7 @@ class _DepartmentCard extends StatelessWidget {
                           style: AppTextStyles.cairo11RegularBlack,
                         ),
                         Text(
-                          'manager'.tr(),
+                          AppStrings.manager,
                           style: AppTextStyles.cairo10RegularGrey,
                         ),
                       ],
@@ -272,7 +376,7 @@ class _DepartmentCard extends StatelessWidget {
                 const Divider(height: 1, color: AppColors.borderGrey),
                 SizedBox(height: 4.h),
                 Text(
-                  'employees_count'.tr(args: [dept.employeesCount.toString()]),
+                  AppStrings.employeesCount.replaceFirst("{}", dept.employeesCount.toString()),
                   style: AppTextStyles.cairo10RegularGrey,
                 ),
               ],

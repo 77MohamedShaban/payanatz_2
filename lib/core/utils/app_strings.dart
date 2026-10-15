@@ -27,4 +27,6 @@ abstract final class AppStrings {
   static String get yes => "yes".tr();
   static String get successful => "successful".tr();
   static String get createSuccessMessage => "create_success_message".tr();
+  static String get noDepartmentsYet => "no_departments_yet".tr();
+  static String get noDepartmentsSubtitle => "no_departments_subtitle".tr();
 }

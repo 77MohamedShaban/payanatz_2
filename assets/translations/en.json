@@ -32,5 +32,7 @@
   "design": "Design",
   "quality": "Quality",
   "support": "Support",
-  "operations": "Operations"
+  "operations": "Operations",
+  "no_departments_yet": "No Departments Yet",
+  "no_departments_subtitle": "Try another name or create a new department"
 }

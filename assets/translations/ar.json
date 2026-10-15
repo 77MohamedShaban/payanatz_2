@@ -32,5 +32,7 @@
   "design": "التصميم",
   "quality": "الجودة",
   "support": "الدعم",
-  "operations": "العمليات"
+  "operations": "العمليات",
+  "no_departments_yet": "لا توجد أقسام بعد",
+  "no_departments_subtitle": "لا توجد أقسام متاحة حاليًا، يُرجى المحاولة مرة أخرى لاحقًا"
 }
