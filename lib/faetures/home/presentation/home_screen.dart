@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/di/di.dart';
 import '../../../core/reusable_component/custom_text_form_field.dart';
+import '../../../core/routes_manager/routes_name.dart';
 import '../../../core/utils/theme/app_colors.dart';
 import '../../../core/utils/theme/app_text_styles.dart';
 import 'cubit/home_cubit.dart';
@@ -127,7 +128,9 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _buildButton(
                 text: 'create_department'.tr(),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, RoutesName.createDepartment);
+                },
                 backgroundColor: AppColors.hintGrey,
               ),
             ),
@@ -183,6 +186,7 @@ class _DepartmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return Container(
       height: 120.h,
       decoration: BoxDecoration(
