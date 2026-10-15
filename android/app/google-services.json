@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "610756208876",
+    "project_id": "recap-cf6cf",
+    "storage_bucket": "recap-cf6cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:610756208876:android:05f184cf414dbb4f219dc9",
+        "android_client_info": {
+          "package_name": "com.example.recap_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn6LFP4b6FVNdb639midKSqLzmyMWjhDQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
