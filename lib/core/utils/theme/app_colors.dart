@@ -31,5 +31,5 @@ abstract final class AppColors {
   static const Color deptOrange = Color(0xFFE7B449);
   
   static const Color tagBackground = Color(0x26797979); // 15% opacity of #797979
-
+  static const Color tagText = Color(0xFF797979);
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextFormField extends StatefulWidget {
@@ -13,6 +12,7 @@ class CustomTextFormField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool isConfirmPassword;
   final Function(String)? onSubmitted;
+  final Function(String)? onChanged;
 
   const CustomTextFormField({
     super.key,
@@ -24,7 +24,9 @@ class CustomTextFormField extends StatefulWidget {
     this.suffixIcon,
     this.isPassword = false,
     this.validator,
-    this.isConfirmPassword = false, this.onSubmitted,
+    this.isConfirmPassword = false,
+    this.onSubmitted,
+    this.onChanged,
   });
 
   @override
@@ -52,36 +54,36 @@ class _CustomFieldState extends State<CustomTextFormField> {
       controller: widget.controller,
       onTapUpOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
       onFieldSubmitted: widget.onSubmitted,
+      onChanged: widget.onChanged,
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
       obscureText: isShowPassword,
       style: theme.textTheme.labelSmall?.copyWith(
-          fontSize: 18, fontWeight: .w500 , color: theme.colorScheme.primary),
+          fontSize: 18.sp, fontWeight: FontWeight.w500, color: theme.colorScheme.primary),
       decoration: InputDecoration(
         prefixIcon: Padding(
-            padding:  REdgeInsetsDirectional.only(start: 16, end: 8),
+            padding: REdgeInsetsDirectional.only(start: 16, end: 8),
             child: widget.prefixIcon),
         prefixIconColor: theme.colorScheme.onPrimary,
         prefixIconConstraints: BoxConstraints(maxHeight: 40.h, maxWidth: 50.w),
         suffixIcon: widget.isPassword
             ? IconButton(
-          onPressed: () {
-            setState(() {
-              isShowPassword = !isShowPassword;
-            });
-          },
-          icon: Icon(
-            !isShowPassword ? Icons.visibility : Icons.visibility_off,
-            weight: 30.w, color: Colors.grey,
-          ),
-        )
+                onPressed: () {
+                  setState(() {
+                    isShowPassword = !isShowPassword;
+                  });
+                },
+                icon: Icon(
+                  !isShowPassword ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+              )
             : widget.suffixIcon,
         suffixIconColor: theme.colorScheme.onPrimary,
         hintText: widget.hintText,
         hintStyle: theme.textTheme.labelSmall,
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15.r
-          ),
+          borderRadius: BorderRadius.circular(15.r),
           borderSide: BorderSide(
             color: theme.colorScheme.onPrimary,
             width: 1,
@@ -92,6 +94,10 @@ class _CustomFieldState extends State<CustomTextFormField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.r),
+          borderSide: BorderSide(
+            color: theme.colorScheme.primary,
+            width: 1,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.r),
