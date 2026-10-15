@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "610756208876",
-    "project_id": "recap-cf6cf",
-    "storage_bucket": "recap-cf6cf.firebasestorage.app"
+    "project_number": "147673782861",
+    "project_id": "payanatzassignment",
+    "storage_bucket": "payanatzassignment.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:610756208876:android:05f184cf414dbb4f219dc9",
+        "mobilesdk_app_id": "1:147673782861:android:bc0de584b3edd427a35a04",
         "android_client_info": {
           "package_name": "com.example.recap_project"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDn6LFP4b6FVNdb639midKSqLzmyMWjhDQ"
+          "current_key": "AIzaSyDT4vgbcnUWMN1qq2T7c1UXc6aLYgOI5mo"
         }
       ],
       "services": {
